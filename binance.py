@@ -7,14 +7,19 @@ symbol = "xrpusdt"
 url = f"wss://stream.binance.com:9443/ws/{symbol}@ticker_1h"
 
 
-def on_message(ws, message):
-    message_json = json.loads(message)
-    hi_price = float(message_json.get("h"))
-    last_price = float(message_json.get("c"))
+def check_drop(msg):
+    hi_price = float(msg.get("h"))
+    last_price = float(msg.get("c"))
     diff = (hi_price - last_price) * 100 / last_price
+    # print(f"Hi price: {hi_price}, last price: {last_price}, diff: {diff:.2f}")
     if diff > 1:
         print(f"Attention! Last price fell {diff:.2f}% in the last hour.")
         print(f" Hi price: {hi_price}, last_price: {last_price}")
+
+
+def on_message(ws, message):
+    message_json = json.loads(message)
+    check_drop(message_json)
 
 
 def on_error(ws, error):
